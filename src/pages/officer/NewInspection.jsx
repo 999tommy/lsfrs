@@ -19,8 +19,15 @@ export const NewInspection = () => {
   const { data, refreshData } = useData();
   const navigate = useNavigate();
 
+  const now = new Date();
+  const today = now.toISOString().split('T')[0];
+  const currentTime = now.toTimeString().split(' ')[0].substring(0, 5);
+
   const methods = useForm({
     defaultValues: {
+      dateOfInspection: today,
+      timeOfArrival: currentTime,
+      inspectorDate: today,
       cacNumber: '',
       adminCharge: 0,
       amountCharged: 0,

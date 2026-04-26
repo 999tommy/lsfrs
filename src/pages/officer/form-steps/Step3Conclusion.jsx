@@ -1,8 +1,8 @@
-import React from 'react';
 import { useFormContext } from 'react-hook-form';
+import { Calendar } from 'lucide-react';
 
 export const Step3Conclusion = () => {
-  const { register, watch } = useFormContext();
+  const { register, watch, setValue } = useFormContext();
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
@@ -130,11 +130,20 @@ export const Step3Conclusion = () => {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Date *</label>
+            <div className="flex justify-between items-center mb-1">
+              <label className="block text-sm font-medium text-gray-700">Date *</label>
+              <button 
+                type="button"
+                onClick={() => setValue('inspectorDate', new Date().toISOString().split('T')[0])}
+                className="text-xs text-lsfrs-red hover:underline flex items-center gap-1 font-semibold"
+              >
+                <Calendar size={12} /> Today
+              </button>
+            </div>
             <input
               {...register('inspectorDate')}
               type="date"
-              className="w-full px-3 py-2 border rounded-md text-sm"
+              className="w-full px-3 py-2 border rounded-md text-sm focus:ring-2 focus:ring-red-100 outline-none"
             />
           </div>
           <div className="md:col-span-2">
@@ -163,11 +172,20 @@ export const Step3Conclusion = () => {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Date</label>
+            <div className="flex justify-between items-center mb-1">
+              <label className="block text-sm font-medium text-gray-700">Date</label>
+              <button 
+                type="button"
+                onClick={() => setValue('occupierDate', new Date().toISOString().split('T')[0])}
+                className="text-xs text-lsfrs-red hover:underline flex items-center gap-1 font-semibold"
+              >
+                <Calendar size={12} /> Today
+              </button>
+            </div>
             <input
               {...register('occupierDate')}
               type="date"
-              className="w-full px-3 py-2 border rounded-md text-sm"
+              className="w-full px-3 py-2 border rounded-md text-sm focus:ring-2 focus:ring-red-100 outline-none"
             />
           </div>
           <div className="md:col-span-2">

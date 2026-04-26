@@ -1,8 +1,8 @@
-import React from 'react';
 import { useFormContext } from 'react-hook-form';
+import { Calendar, Clock } from 'lucide-react';
 
 export const Step1General = () => {
-  const { register, watch, formState: { errors } } = useFormContext();
+  const { register, watch, setValue, formState: { errors } } = useFormContext();
   const occupancyType = watch('occupancyType');
 
   return (
@@ -100,20 +100,38 @@ export const Step1General = () => {
         <h3 className="text-lg font-bold text-gray-800 border-b pb-2 mb-4 mt-8">2. Inspection Details</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
           <div>
-            <label className="block text-gray-700 font-medium mb-1">Date of Inspection *</label>
+            <div className="flex justify-between items-center mb-1">
+              <label className="block text-gray-700 font-medium">Date of Inspection *</label>
+              <button 
+                type="button"
+                onClick={() => setValue('dateOfInspection', new Date().toISOString().split('T')[0])}
+                className="text-xs text-lsfrs-red hover:underline flex items-center gap-1 font-semibold"
+              >
+                <Calendar size={14} /> Today
+              </button>
+            </div>
             <input 
               {...register('dateOfInspection')} 
               type="date"
-              className="w-full px-3 py-2 border rounded-md"
+              className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-red-100 outline-none"
             />
           </div>
 
           <div>
-            <label className="block text-gray-700 font-medium mb-1">Time of Arrival</label>
+            <div className="flex justify-between items-center mb-1">
+              <label className="block text-gray-700 font-medium">Time of Arrival</label>
+              <button 
+                type="button"
+                onClick={() => setValue('timeOfArrival', new Date().toTimeString().split(' ')[0].substring(0, 5))}
+                className="text-xs text-lsfrs-red hover:underline flex items-center gap-1 font-semibold"
+              >
+                <Clock size={14} /> Now
+              </button>
+            </div>
             <input 
               {...register('timeOfArrival')} 
               type="time"
-              className="w-full px-3 py-2 border rounded-md"
+              className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-red-100 outline-none"
             />
           </div>
 
