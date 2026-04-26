@@ -1,0 +1,13 @@
+@import "tailwindcss";
+
+@theme {
+  --color-lsfrs-red: #CC0000;
+  --color-lsfrs-green: #00843D;
+  --color-lsfrs-gold: #FFB300;
+}
+
+@layer base {
+  body {
+    @apply bg-gray-50 text-gray-900;
+  }
+}
