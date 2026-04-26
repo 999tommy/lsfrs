@@ -31,10 +31,7 @@ export const NewInspection = () => {
       cacNumber: '',
       adminCharge: 0,
       amountCharged: 0,
-      checklistItems: Array(23).fill({ status: '', remark: '' }),
-      housekeeping: {
-        flammable: '', electrical: '', gas: '', waste: ''
-      },
+      checklistItems: Array(25).fill({ status: '', remark: '' }),
       fireComplianceStatus: '',
       riskClassification: 'low',
       keyObservations: Array(5).fill(''),

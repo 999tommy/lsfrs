@@ -2,14 +2,31 @@ import React from 'react';
 import { useFormContext, useFieldArray } from 'react-hook-form';
 
 const ITEMS = [
-  "FIRE ALARM SYSTEM", "FIRE EXTINGUISHERS", "FIRE SPRINKLER SYSTEM (WHERE APPLICABLE)",
-  "HOSE REEL", "FIRE SAFETY TRAINING", "SMOKE DETECTOR", "FIRE EMERGENCY EXITS",
-  "FIRE SAFETY TRAINING / DRILL RECORD", "NOS. OF GENERATORS", "AUTOMATIC FIRE ALARM DETECTION SYSTEM",
-  "INSURANCE COVER", "HOSE BOX", "HYDRANT/LANDING VALVE POINT", "EMERGENCY LIGHTING",
-  "FIRE BLANKET", "SAFETY / DIRECTIONAL SIGNS", "MUSTER / ASSEMBLY POINT",
-  "LAGOS STATE FIRE AND RESCUE SERVICE FIRE NOTICES", "FIRE INCIDENT LOG",
-  "FIRE SAFETY TRAINING RECORDS FOR STAFF", "PREVIOUS FIRE SAFETY COMPLIANCE CERTIFICATE",
-  "DESIGNATED FIRE MARSHAL", "SOURCE OF WATER SUPPLY FOR FIRE FIGHTING OPERATIONS"
+  "FIRE DETECTION / ALARM SYSTEM",
+  "FIRE EXTINGUISHERS",
+  "FIRE SUPPRESSION SYSTEM (FM 200, SPRINKLER, CO2, DRENCHERS)",
+  "HOSE REEL EQUIPMENT",
+  "RISING MAINS (WET)",
+  "HYDRANT POINT(S)",
+  "HOSE CABINET & COMPONENTS",
+  "EMERGENCY LIGHTING",
+  "FIRE BLANKET",
+  "FIRE SAFETY SIGNAGES",
+  "FIRE ASSEMBLY / MUSTER POINT",
+  "FIRE NOTICE PLAQUE",
+  "DESIGNATED FIRE MARSHAL",
+  "FIRE EMERGENCY EXITS",
+  "SOURCE OF WATER SUPPLY FOR FIRE FIGHTING OPERATIONS",
+  "FIRE SAFETY TRAINING / DRILL RECORD",
+  "INSURANCE COVER",
+  "FIRE RISK ASSESSMENT",
+  "EMERGENCY EVACUATION PLAN",
+  "FIRE INCIDENT RECORD",
+  "STORAGE OF FLAMMABLE MATERIALS (HOUSEKEEPING)",
+  "ELECTRICAL INSTALLATION (HOUSEKEEPING)",
+  "INSTALLATION OF GAS CYLINDERS (HOUSEKEEPING)",
+  "WASTE STORAGE AND DISPOSAL (HOUSEKEEPING)",
+  "GENERATOR(S)"
 ];
 
 export const Step2Checklist = () => {
@@ -64,29 +81,7 @@ export const Step2Checklist = () => {
         </div>
       </div>
 
-      <div className="pt-4 border-t border-gray-200">
-        <h3 className="text-lg font-bold text-gray-800 pb-2 mb-4">24. Good Housekeeping</h3>
-        <div className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-gray-700 font-medium mb-1 text-sm">i. Proper Storage of Flammable Material</label>
-              <input {...register('housekeeping.flammable')} className="w-full px-3 py-2 border rounded-md text-sm" placeholder="Comments..." />
-            </div>
-            <div>
-              <label className="block text-gray-700 font-medium mb-1 text-sm">ii. Electrical Installation Properly Maintained</label>
-              <input {...register('housekeeping.electrical')} className="w-full px-3 py-2 border rounded-md text-sm" placeholder="Comments..." />
-            </div>
-            <div>
-              <label className="block text-gray-700 font-medium mb-1 text-sm">iii. Gas Cylinders Properly Stored and Secured</label>
-              <input {...register('housekeeping.gas')} className="w-full px-3 py-2 border rounded-md text-sm" placeholder="Comments..." />
-            </div>
-            <div>
-              <label className="block text-gray-700 font-medium mb-1 text-sm">iv. No Combustible Waste Accumulation</label>
-              <input {...register('housekeeping.waste')} className="w-full px-3 py-2 border rounded-md text-sm" placeholder="Comments..." />
-            </div>
-          </div>
-        </div>
-      </div>
+
 
       <div className="pt-4 border-t border-gray-200">
         <h3 className="text-lg font-bold text-gray-800 pb-2 mb-4">24 (B). Fire Safety Certificate Compliance</h3>

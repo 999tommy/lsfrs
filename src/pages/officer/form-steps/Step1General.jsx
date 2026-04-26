@@ -138,7 +138,7 @@ export const Step1General = () => {
           <div className="md:col-span-2">
             <label className="block text-gray-700 font-medium mb-1">Inspection Type *</label>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-              {['routine', 'fire_safety', 'pre_occupancy', 'post_incidence', 'compliance', 'special'].map((type) => (
+              {['routine', 'fire_safety', 'targeted', 'pre_occupancy', 'post_incidence', 'compliance', 'special'].map((type) => (
                 <label key={type} className="flex items-center space-x-2">
                   <input 
                     {...register('inspectionType')} 

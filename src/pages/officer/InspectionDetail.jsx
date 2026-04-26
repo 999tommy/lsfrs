@@ -13,18 +13,36 @@ import { FileDown, CreditCard, AlertTriangle, CheckCircle2, ShieldCheck } from '
 import toast from 'react-hot-toast';
 
 const CHECKLIST_LABELS = [
-  "FIRE ALARM SYSTEM","FIRE EXTINGUISHERS","FIRE SPRINKLER SYSTEM (WHERE APPLICABLE)",
-  "HOSE REEL","FIRE SAFETY TRAINING","SMOKE DETECTOR","FIRE EMERGENCY EXITS",
-  "FIRE SAFETY TRAINING / DRILL RECORD","NOS. OF GENERATORS","AUTOMATIC FIRE ALARM DETECTION SYSTEM",
-  "INSURANCE COVER","HOSE BOX","HYDRANT/LANDING VALVE POINT","EMERGENCY LIGHTING",
-  "FIRE BLANKET","SAFETY / DIRECTIONAL SIGNS","MUSTER / ASSEMBLY POINT",
-  "LAGOS STATE FIRE AND RESCUE SERVICE FIRE NOTICES","FIRE INCIDENT LOG",
-  "FIRE SAFETY TRAINING RECORDS FOR STAFF","PREVIOUS FIRE SAFETY COMPLIANCE CERTIFICATE",
-  "DESIGNATED FIRE MARSHAL","SOURCE OF WATER SUPPLY FOR FIRE FIGHTING OPERATIONS"
+  "FIRE DETECTION / ALARM SYSTEM",
+  "FIRE EXTINGUISHERS",
+  "FIRE SUPPRESSION SYSTEM (FM 200, SPRINKLER, CO2, DRENCHERS)",
+  "HOSE REEL EQUIPMENT",
+  "RISING MAINS (WET)",
+  "HYDRANT POINT(S)",
+  "HOSE CABINET & COMPONENTS",
+  "EMERGENCY LIGHTING",
+  "FIRE BLANKET",
+  "FIRE SAFETY SIGNAGES",
+  "FIRE ASSEMBLY / MUSTER POINT",
+  "FIRE NOTICE PLAQUE",
+  "DESIGNATED FIRE MARSHAL",
+  "FIRE EMERGENCY EXITS",
+  "SOURCE OF WATER SUPPLY FOR FIRE FIGHTING OPERATIONS",
+  "FIRE SAFETY TRAINING / DRILL RECORD",
+  "INSURANCE COVER",
+  "FIRE RISK ASSESSMENT",
+  "EMERGENCY EVACUATION PLAN",
+  "FIRE INCIDENT RECORD",
+  "STORAGE OF FLAMMABLE MATERIALS (HOUSEKEEPING)",
+  "ELECTRICAL INSTALLATION (HOUSEKEEPING)",
+  "INSTALLATION OF GAS CYLINDERS (HOUSEKEEPING)",
+  "WASTE STORAGE AND DISPOSAL (HOUSEKEEPING)",
+  "GENERATOR(S)"
 ];
 
 const statusConfig = {
   pending_payment:   { label: 'Pending Payment',   variant: 'yellow' },
+  awaiting_approval: { label: 'Awaiting Approval', variant: 'blue'   },
   approved:          { label: 'Approved (Paid)',    variant: 'green'  },
   rejected:          { label: 'Rejected',           variant: 'red'    },
 };
@@ -59,25 +77,6 @@ export const InspectionDetail = () => {
     }
 
     const now = new Date();
-    const expiry = new Date(now);
-    expiry.setFullYear(expiry.getFullYear() + 1);
-
-    // Auto-generate certificate
-    const newCert = {
-      id: uuidv4(),
-      certificateNumber: generateCertNumber(data.certificates),
-      inspectionId: id,
-      facilityName: inspection.facilityName,
-      facilityAddress: inspection.address,
-      stationId: inspection.stationId,
-      officerId: inspection.officerId,
-      directorName: "Director LSFRS", // Placeholder as it's auto-approved now
-      issuedAt: now.toISOString(),
-      expiresAt: expiry.toISOString(),
-    };
-
-    const updatedCerts = [...(data.certificates || []), newCert];
-    setStorage(LS_KEYS.CERTIFICATES, updatedCerts);
 
     const updatedInspections = data.inspections.map(i => {
       if (i.id === id) {
@@ -85,8 +84,7 @@ export const InspectionDetail = () => {
           ...i,
           amountPaid: Number(amountPaid),
           paymentDate: now.toISOString(),
-          status: 'approved',
-          approvedAt: now.toISOString(),
+          status: 'awaiting_approval',
           updatedAt: now.toISOString()
         };
       }
@@ -94,9 +92,9 @@ export const InspectionDetail = () => {
     });
 
     setStorage(LS_KEYS.INSPECTIONS, updatedInspections);
-    logActivity('payment_marked_and_approved', currentUser, `Payment of ₦${amountPaid} marked and certificate issued for ${inspection.facilityName}`, { certNumber: newCert.certificateNumber });
+    logActivity('payment_marked', currentUser, `Payment of ₦${amountPaid} marked for ${inspection.facilityName}. Now awaiting Director approval.`);
     refreshData();
-    toast.success('Payment recorded and Certificate issued!');
+    toast.success('Payment recorded! Sent to Director for final approval.');
     setAmountPaid('');
   };
 
@@ -118,16 +116,27 @@ export const InspectionDetail = () => {
         </div>
       </div>
 
+      {/* Awaiting Approval Notice */}
+      {inspection.status === 'awaiting_approval' && (
+        <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-md flex gap-3 animate-in fade-in slide-in-from-top-2">
+          <AlertTriangle className="text-blue-600 w-5 h-5 flex-shrink-0 mt-0.5" />
+          <div>
+            <h4 className="font-semibold text-blue-700">Awaiting Director Approval</h4>
+            <p className="text-sm text-blue-800 mt-1">Payment has been recorded. The Director must now review and approve this inspection before the certificate is issued.</p>
+          </div>
+        </div>
+      )}
+
       {/* Approval Notice */}
       {inspection.status === 'approved' && (
-        <div className="bg-green-50 border-l-4 border-green-500 p-4 rounded-md flex gap-3">
+        <div className="bg-green-50 border-l-4 border-green-500 p-4 rounded-md flex gap-3 animate-in fade-in slide-in-from-top-2">
           <CheckCircle2 className="text-green-600 w-5 h-5 flex-shrink-0 mt-0.5" />
           <div>
-            <h4 className="font-semibold text-green-700">Inspection Approved & Paid</h4>
-            <p className="text-sm text-green-800 mt-1">A fire safety certificate has been automatically issued. Visit the certificates page to download it.</p>
+            <h4 className="font-semibold text-green-700">Inspection Approved & Certificate Issued</h4>
+            <p className="text-sm text-green-800 mt-1">The Director has approved this inspection. You can now download the certificate.</p>
             <Button 
               variant="secondary" 
-              className="mt-3 text-sm"
+              className="mt-3 text-sm shadow-sm"
               onClick={() => navigate('/officer/certificates')}
             >
               <ShieldCheck className="w-4 h-4 mr-2" />
@@ -138,29 +147,29 @@ export const InspectionDetail = () => {
       )}
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Card>
-          <CardBody className="py-3">
-            <p className="text-xs text-gray-500 uppercase">Inspection Type</p>
-            <p className="font-semibold capitalize mt-1">{(inspection.inspectionType || '').replace('_', ' ')}</p>
+          <CardBody className="p-3">
+            <p className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">Type</p>
+            <p className="font-semibold capitalize mt-0.5 truncate">{(inspection.inspectionType || '').replace('_', ' ')}</p>
           </CardBody>
         </Card>
         <Card>
-          <CardBody className="py-3">
-            <p className="text-xs text-gray-500 uppercase">Risk Level</p>
-            <p className="font-semibold uppercase mt-1">{inspection.riskClassification}</p>
+          <CardBody className="p-3">
+            <p className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">Risk</p>
+            <p className="font-semibold uppercase mt-0.5">{inspection.riskClassification}</p>
           </CardBody>
         </Card>
         <Card>
-          <CardBody className="py-3">
-            <p className="text-xs text-gray-500 uppercase">Admin Charge</p>
-            <p className="font-semibold mt-1">₦{(inspection.adminCharge || 0).toLocaleString()}</p>
+          <CardBody className="p-3">
+            <p className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">Admin Fee</p>
+            <p className="font-semibold mt-0.5">₦{(inspection.adminCharge || 0).toLocaleString()}</p>
           </CardBody>
         </Card>
         <Card>
-          <CardBody className="py-3">
-            <p className="text-xs text-gray-500 uppercase">Amount Charged</p>
-            <p className="font-semibold mt-1 text-lsfrs-red">₦{(inspection.amountCharged || 0).toLocaleString()}</p>
+          <CardBody className="p-3">
+            <p className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">Charge</p>
+            <p className="font-semibold mt-0.5 text-lsfrs-red">₦{(inspection.amountCharged || 0).toLocaleString()}</p>
           </CardBody>
         </Card>
       </div>
@@ -176,19 +185,19 @@ export const InspectionDetail = () => {
           </CardHeader>
           <CardBody>
             <p className="text-sm text-gray-600 mb-4">Confirm total amount received from the company to issue the fire safety certificate immediately.</p>
-            <div className="flex gap-3 items-end">
-              <div className="flex-1">
+            <div className="flex flex-col sm:flex-row gap-4 sm:items-end">
+              <div className="flex-1 w-full">
                 <label className="block text-sm font-medium text-gray-700 mb-1">Total Amount Received (₦)</label>
                 <input
                   type="number"
                   min="0"
                   value={amountPaid}
                   onChange={e => setAmountPaid(e.target.value)}
-                  className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-lsfrs-red focus:border-lsfrs-red outline-none"
+                  className="w-full px-4 py-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-lsfrs-red focus:border-lsfrs-red outline-none"
                   placeholder={`Recommended: ₦${(Number(inspection.adminCharge || 0) + Number(inspection.amountCharged || 0)).toLocaleString()}`}
                 />
               </div>
-              <Button onClick={handleMarkPaid} className="shrink-0 bg-lsfrs-green hover:bg-green-700">
+              <Button onClick={handleMarkPaid} className="w-full sm:w-auto bg-lsfrs-green hover:bg-green-700 shadow-md">
                 Record Payment & Issue Cert
               </Button>
             </div>
@@ -197,12 +206,12 @@ export const InspectionDetail = () => {
       )}
 
       {/* Actions */}
-      <div className="flex flex-wrap gap-3">
-        <Button variant="outline" onClick={handleDownloadPDF} className="flex items-center gap-2">
+      <div className="flex flex-col sm:flex-row gap-3">
+        <Button onClick={handleDownloadPDF} className="w-full sm:w-auto flex items-center gap-2 shadow-md">
           <FileDown className="w-4 h-4" />
           Download Inspection Report (PDF)
         </Button>
-        <Button variant="ghost" onClick={() => navigate('/officer/dashboard')}>
+        <Button variant="ghost" onClick={() => navigate('/officer/dashboard')} className="w-full sm:w-auto">
           ← Back to Dashboard
         </Button>
       </div>
@@ -294,22 +303,22 @@ export const InspectionDetail = () => {
 
       <Card>
         <CardHeader>Declaration & Timeline</CardHeader>
-        <CardBody className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
+        <CardBody className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
           <div>
-            <p className="text-xs text-gray-400">Compliance</p>
-            <p className="font-semibold uppercase">{inspection.fireComplianceStatus?.replace('_', ' ')}</p>
+            <p className="text-[10px] text-gray-400 uppercase font-bold">Compliance</p>
+            <p className="font-semibold uppercase truncate">{inspection.fireComplianceStatus?.replace('_', ' ')}</p>
           </div>
           <div>
-            <p className="text-xs text-gray-400">Timeline</p>
-            <p className="font-semibold uppercase">{inspection.complianceTimeline}</p>
+            <p className="text-[10px] text-gray-400 uppercase font-bold">Timeline</p>
+            <p className="font-semibold uppercase truncate">{inspection.complianceTimeline}</p>
           </div>
           <div>
-            <p className="text-xs text-gray-400">Inspector</p>
-            <p className="font-semibold">{inspection.inspectorName}</p>
+            <p className="text-[10px] text-gray-400 uppercase font-bold">Inspector</p>
+            <p className="font-semibold truncate">{inspection.inspectorName}</p>
           </div>
           <div>
-            <p className="text-xs text-gray-400">Occupier</p>
-            <p className="font-semibold">{inspection.occupierName || '—'}</p>
+            <p className="text-[10px] text-gray-400 uppercase font-bold">Occupier</p>
+            <p className="font-semibold truncate">{inspection.occupierName || '—'}</p>
           </div>
         </CardBody>
       </Card>

@@ -81,11 +81,13 @@ export const Step3Conclusion = () => {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Amount Charged (₦)</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1 leading-tight">
+              Amount charged for the year (fire safety certificate in compliance with lagos state fire and rescue service law 2024) (₦)
+            </label>
             <input
               {...register('amountCharged')}
               type="number"
-              className="w-full px-3 py-2 border rounded-md text-sm"
+              className="w-full px-3 py-2 border rounded-md text-sm mt-1"
               placeholder="0.00"
             />
           </div>

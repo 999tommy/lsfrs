@@ -21,10 +21,7 @@ export const ProtectedRoute = ({ children, allowedRoles }) => {
     if (currentUser.role === 'technical') return <Navigate to="/technical/dashboard" replace />;
   }
 
-  // Force officers to change password on first login
-  if (currentUser.role === 'officer' && currentUser.isFirstLogin && location.pathname !== '/officer/settings') {
-    return <Navigate to="/officer/settings" replace />;
-  }
+
 
   return children;
 };

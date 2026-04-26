@@ -9,24 +9,117 @@ import { FileDown, ShieldCheck, Eye } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const CHECKLIST_LABELS = [
-  "FIRE ALARM SYSTEM","FIRE EXTINGUISHERS","FIRE SPRINKLER SYSTEM (WHERE APPLICABLE)","HOSE REEL","FIRE SAFETY TRAINING",
-  "SMOKE DETECTOR","FIRE EMERGENCY EXITS","FIRE SAFETY TRAINING / DRILL RECORD","NOS. OF GENERATORS",
-  "AUTOMATIC FIRE ALARM DETECTION SYSTEM","INSURANCE COVER","HOSE BOX","HYDRANT/LANDING VALVE POINT",
-  "EMERGENCY LIGHTING","FIRE BLANKET","SAFETY / DIRECTIONAL SIGNS","MUSTER / ASSEMBLY POINT",
-  "LAGOS STATE FIRE AND RESCUE SERVICE FIRE NOTICES","FIRE INCIDENT LOG","FIRE SAFETY TRAINING RECORDS FOR STAFF",
-  "PREVIOUS FIRE SAFETY COMPLIANCE CERTIFICATE","DESIGNATED FIRE MARSHAL","SOURCE OF WATER SUPPLY FOR FIRE FIGHTING OPERATIONS"
+  "FIRE DETECTION / ALARM SYSTEM",
+  "FIRE EXTINGUISHERS",
+  "FIRE SUPPRESSION SYSTEM (FM 200, SPRINKLER, CO2, DRENCHERS)",
+  "HOSE REEL EQUIPMENT",
+  "RISING MAINS (WET)",
+  "HYDRANT POINT(S)",
+  "HOSE CABINET & COMPONENTS",
+  "EMERGENCY LIGHTING",
+  "FIRE BLANKET",
+  "FIRE SAFETY SIGNAGES",
+  "FIRE ASSEMBLY / MUSTER POINT",
+  "FIRE NOTICE PLAQUE",
+  "DESIGNATED FIRE MARSHAL",
+  "FIRE EMERGENCY EXITS",
+  "SOURCE OF WATER SUPPLY FOR FIRE FIGHTING OPERATIONS",
+  "FIRE SAFETY TRAINING / DRILL RECORD",
+  "INSURANCE COVER",
+  "FIRE RISK ASSESSMENT",
+  "EMERGENCY EVACUATION PLAN",
+  "FIRE INCIDENT RECORD",
+  "STORAGE OF FLAMMABLE MATERIALS (HOUSEKEEPING)",
+  "ELECTRICAL INSTALLATION (HOUSEKEEPING)",
+  "INSTALLATION OF GAS CYLINDERS (HOUSEKEEPING)",
+  "WASTE STORAGE AND DISPOSAL (HOUSEKEEPING)",
+  "GENERATOR(S)"
 ];
 
 const statusConfig = {
   pending_payment:   { label: 'Pending Payment',   variant: 'yellow' },
+  awaiting_approval: { label: 'Awaiting Approval', variant: 'blue'   },
   approved:          { label: 'Approved (Paid)',    variant: 'green'  },
   rejected:          { label: 'Rejected',           variant: 'red'    },
 };
 
+import { v4 as uuidv4 } from 'uuid';
+import { LS_KEYS, setStorage } from '../../utils/localStorage';
+import { logActivity } from '../../utils/logger';
+
 export const InspectionReview = () => {
   const { id } = useParams();
-  const { data } = useData();
+  const { data, refreshData } = useData();
   const navigate = useNavigate();
+
+  const generateCertNumber = (existingCerts = []) => {
+    const year = new Date().getFullYear();
+    const count = existingCerts.length + 1;
+    return `LSFRS/CERT/${year}/${count.toString().padStart(4, '0')}`;
+  };
+
+  const handleApprove = () => {
+    const now = new Date();
+    // Certificates expire on December 31st of the current year per regulation
+    const expiry = new Date(now.getFullYear(), 11, 31, 23, 59, 59);
+
+    const newCert = {
+      id: uuidv4(),
+      certificateNumber: generateCertNumber(data.certificates),
+      inspectionId: id,
+      facilityName: inspection.facilityName,
+      facilityAddress: inspection.address,
+      stationId: inspection.stationId,
+      officerId: inspection.officerId,
+      directorName: "Director LSFRS",
+      issuedAt: now.toISOString(),
+      expiresAt: expiry.toISOString(),
+    };
+
+    const updatedCerts = [...(data.certificates || []), newCert];
+    setStorage(LS_KEYS.CERTIFICATES, updatedCerts);
+
+    const updatedInspections = data.inspections.map(i => {
+      if (i.id === id) {
+        return {
+          ...i,
+          status: 'approved',
+          approvedAt: now.toISOString(),
+          updatedAt: now.toISOString()
+        };
+      }
+      return i;
+    });
+
+    setStorage(LS_KEYS.INSPECTIONS, updatedInspections);
+    logActivity('inspection_approved', { name: 'Director', role: 'admin' }, `Inspection for ${inspection.facilityName} approved and certificate issued.`, { certNumber: newCert.certificateNumber });
+    refreshData();
+    toast.success('Inspection Approved! Certificate generated.');
+    navigate('/admin/inspections');
+  };
+
+  const handleReject = () => {
+    const reason = prompt('Please enter a reason for rejection:');
+    if (!reason) return;
+
+    const updatedInspections = data.inspections.map(i => {
+      if (i.id === id) {
+        return {
+          ...i,
+          status: 'rejected',
+          rejectionReason: reason,
+          updatedAt: new Date().toISOString()
+        };
+      }
+      return i;
+    });
+
+    setStorage(LS_KEYS.INSPECTIONS, updatedInspections);
+    logActivity('inspection_rejected', { name: 'Director', role: 'admin' }, `Inspection for ${inspection.facilityName} rejected: ${reason}`);
+    refreshData();
+    toast.error('Inspection rejected.');
+    navigate('/admin/inspections');
+  };
 
   const inspection = data.inspections.find(i => i.id === id);
   const station = data.stations.find(s => s.id === inspection?.stationId);
@@ -73,7 +166,7 @@ export const InspectionReview = () => {
             <p className="text-lg font-bold">₦{(inspection.adminCharge || 0).toLocaleString()}</p>
           </div>
           <div>
-            <p className="text-xs text-gray-400 uppercase">Amount Charged</p>
+            <p className="text-[10px] text-gray-400 uppercase font-bold tracking-tight">Amount Charged (Fire Safety Law 2024)</p>
             <p className="text-lg font-bold text-lsfrs-red">₦{(inspection.amountCharged || 0).toLocaleString()}</p>
           </div>
           <div>
@@ -83,10 +176,22 @@ export const InspectionReview = () => {
         </CardBody>
       </Card>
 
-      <div className="flex gap-3">
+      <div className="flex flex-col sm:flex-row gap-3">
         <Button variant="outline" className="gap-2" onClick={() => generateInspectionPDF(inspection, station, officer?.name)}>
           <FileDown className="w-4 h-4" /> Download Report
         </Button>
+        
+        {inspection.status === 'awaiting_approval' && (
+          <div className="flex gap-2 w-full sm:w-auto">
+            <Button className="flex-1 sm:flex-none gap-2 bg-green-600 hover:bg-green-700 text-white" onClick={handleApprove}>
+              <ShieldCheck className="w-4 h-4" /> Approve & Issue Certificate
+            </Button>
+            <Button variant="danger" className="flex-1 sm:flex-none" onClick={handleReject}>
+              Reject
+            </Button>
+          </div>
+        )}
+
         {inspection.status === 'approved' && (
           <Button variant="secondary" className="gap-2" onClick={() => navigate('/admin/certificates')}>
             <ShieldCheck className="w-4 h-4" /> View Certificates

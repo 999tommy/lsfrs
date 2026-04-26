@@ -28,6 +28,18 @@ const technicalLinks = [
   { to: '/technical/stations', icon: Building2, label: 'Station Admin' }
 ];
 
+export const TopBar = ({ setIsMobileOpen, title = "Dashboard" }) => {
+  return (
+    <header className="h-16 bg-white/80 backdrop-blur-md border-b border-gray-100 flex items-center justify-between px-4 lg:px-8 z-30 sticky top-0">
+      <button onClick={() => setIsMobileOpen(true)} className="lg:hidden p-2 -ml-2 text-gray-600">
+        <Menu className="w-6 h-6" />
+      </button>
+      <h1 className="font-bold text-gray-800 text-lg">{title}</h1>
+      <div />
+    </header>
+  );
+};
+
 export const Sidebar = ({ isMobileOpen, setIsMobileOpen }) => {
   const { currentUser, logout } = useAuth();
 
@@ -41,20 +53,19 @@ export const Sidebar = ({ isMobileOpen, setIsMobileOpen }) => {
       to={to}
       onClick={() => setIsMobileOpen(false)}
       className={({ isActive }) =>
-        `flex items-center px-4 py-3 mb-2 rounded-lg transition-colors ${isActive
-          ? 'bg-lsfrs-red text-white'
-          : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+        `flex items-center px-4 py-3 mb-1 rounded-xl transition-all duration-200 group ${isActive
+          ? 'bg-lsfrs-red text-white shadow-lg shadow-red-900/20'
+          : 'text-gray-500 hover:bg-red-50 hover:text-lsfrs-red'
         }`
       }
     >
-      <Icon className="w-5 h-5 mr-3" />
-      <span className="font-medium">{label}</span>
+      <Icon className={`w-5 h-5 mr-3 transition-transform duration-200 group-hover:scale-110`} />
+      <span className="font-semibold tracking-tight">{label}</span>
     </NavLink>
   );
 
   return (
     <>
-      {/* Mobile Backdrop */}
       {isMobileOpen && (
         <div
           className="fixed inset-0 bg-black/50 z-40 lg:hidden"
@@ -62,19 +73,17 @@ export const Sidebar = ({ isMobileOpen, setIsMobileOpen }) => {
         />
       )}
 
-      {/* Sidebar */}
       <aside className={`
         fixed inset-y-0 left-0 bg-white border-r border-gray-100 text-gray-900 w-64 flex flex-col z-50 transition-transform duration-300 transform
         ${isMobileOpen ? 'translate-x-0' : '-translate-x-full'}
         lg:translate-x-0 lg:static lg:inset-auto shadow-sm
       `}>
-        {/* Logo Area */}
-        <div className="h-16 flex items-center justify-between px-6 bg-gray-50/50 border-b border-gray-100">
+        <div className="h-16 flex items-center justify-between px-6 bg-white border-b border-gray-50">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center shadow-sm overflow-hidden p-1 border border-gray-100">
-              <img src="/logo.jpg" alt="Logo" className="w-full h-full object-contain" />
+            <div className="w-8 h-8 bg-lsfrs-red rounded flex items-center justify-center">
+              <ShieldCheck className="w-5 h-5 text-white" />
             </div>
-            <span className="font-bold text-lg leading-tight uppercase text-lsfrs-red">LSFRS<br />Portal</span>
+            <span className="font-bold text-lg leading-tight uppercase text-gray-800">LSFRS</span>
           </div>
           <button
             onClick={() => setIsMobileOpen(false)}
@@ -84,16 +93,14 @@ export const Sidebar = ({ isMobileOpen, setIsMobileOpen }) => {
           </button>
         </div>
 
-        {/* User Info */}
-        <div className="px-6 py-6 border-b border-gray-50">
-          <p className="text-xs text-gray-400 uppercase tracking-wider font-bold">{currentUser?.role}</p>
+        <div className="px-6 py-6 border-b border-gray-50 bg-gray-50/50">
+          <p className="text-[10px] text-gray-400 uppercase tracking-widest font-bold">{currentUser?.role}</p>
           <p className="font-bold text-gray-900 truncate mt-1">{currentUser?.name}</p>
           {currentUser?.stationId && (
-            <p className="text-sm text-lsfrs-gold font-medium mt-1">Station: {currentUser.stationId}</p>
+            <p className="text-sm text-lsfrs-red font-medium mt-1">Station: {currentUser.stationId}</p>
           )}
         </div>
 
-        {/* Navigation */}
         <nav className="flex-1 px-4 py-6 overflow-y-auto">
           {links.map((link) => (
             <NavItem key={link.to} {...link} />
