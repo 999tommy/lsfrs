@@ -43,7 +43,7 @@ export const Sidebar = ({ isMobileOpen, setIsMobileOpen }) => {
       className={({ isActive }) =>
         `flex items-center px-4 py-3 mb-2 rounded-lg transition-colors ${isActive
           ? 'bg-lsfrs-red text-white'
-          : 'text-gray-400 hover:bg-gray-800 hover:text-white'
+          : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
         }`
       }
     >
@@ -64,32 +64,32 @@ export const Sidebar = ({ isMobileOpen, setIsMobileOpen }) => {
 
       {/* Sidebar */}
       <aside className={`
-        fixed inset-y-0 left-0 bg-[#1A1A2E] text-white w-64 flex flex-col z-50 transition-transform duration-300 transform
+        fixed inset-y-0 left-0 bg-white border-r border-gray-100 text-gray-900 w-64 flex flex-col z-50 transition-transform duration-300 transform
         ${isMobileOpen ? 'translate-x-0' : '-translate-x-full'}
-        lg:translate-x-0 lg:static lg:inset-auto
+        lg:translate-x-0 lg:static lg:inset-auto shadow-sm
       `}>
         {/* Logo Area */}
-        <div className="h-16 flex items-center justify-between px-6 bg-black/20">
+        <div className="h-16 flex items-center justify-between px-6 bg-gray-50/50 border-b border-gray-100">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center overflow-hidden p-1">
+            <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center shadow-sm overflow-hidden p-1 border border-gray-100">
               <img src="/logo.jpg" alt="Logo" className="w-full h-full object-contain" />
             </div>
-            <span className="font-bold text-lg leading-tight uppercase">LSFRS<br />Portal</span>
+            <span className="font-bold text-lg leading-tight uppercase text-lsfrs-red">LSFRS<br />Portal</span>
           </div>
           <button
             onClick={() => setIsMobileOpen(false)}
-            className="lg:hidden text-gray-400 hover:text-white"
+            className="lg:hidden text-gray-400 hover:text-gray-600"
           >
             <X className="w-6 h-6" />
           </button>
         </div>
 
         {/* User Info */}
-        <div className="px-6 py-6 border-b border-gray-800">
-          <p className="text-sm text-gray-400 uppercase tracking-wider">{currentUser?.role}</p>
-          <p className="font-semibold text-lg truncate mt-1">{currentUser?.name}</p>
+        <div className="px-6 py-6 border-b border-gray-50">
+          <p className="text-xs text-gray-400 uppercase tracking-wider font-bold">{currentUser?.role}</p>
+          <p className="font-bold text-gray-900 truncate mt-1">{currentUser?.name}</p>
           {currentUser?.stationId && (
-            <p className="text-sm text-lsfrs-gold mt-1">Station: {currentUser.stationId}</p>
+            <p className="text-sm text-lsfrs-gold font-medium mt-1">Station: {currentUser.stationId}</p>
           )}
         </div>
 
@@ -101,10 +101,10 @@ export const Sidebar = ({ isMobileOpen, setIsMobileOpen }) => {
         </nav>
 
         {/* Footer */}
-        <div className="p-4 border-t border-gray-800">
+        <div className="p-4 border-t border-gray-50">
           <button
             onClick={logout}
-            className="flex items-center w-full px-4 py-3 text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
+            className="flex items-center w-full px-4 py-3 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
           >
             <LogOut className="w-5 h-5 mr-3" />
             <span className="font-medium">Logout</span>

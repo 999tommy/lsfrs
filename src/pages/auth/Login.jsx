@@ -20,10 +20,8 @@ export const Login = () => {
     const result = login(username, password);
     if (result.success) {
       const { role, isFirstLogin } = result.user;
-      if (role === 'officer' && isFirstLogin) {
-        navigate('/officer/settings');
-      } else if (role === 'officer') {
-        navigate('/officer/dashboard');
+      if (role === 'officer') {
+        navigate('/officer/inspection/new');
       } else if (role === 'admin') {
         navigate('/admin/dashboard');
       } else if (role === 'technical') {
