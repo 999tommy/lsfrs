@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 import { useData } from '../../contexts/DataContext';
+import { useAuth } from '../../contexts/AuthContext';
 import { LS_KEYS, setStorage } from '../../utils/localStorage';
 import { hashPassword } from '../../utils/auth';
 import { logActivity } from '../../utils/logger';
@@ -18,6 +19,7 @@ export const Signup = () => {
   const [error, setError] = useState('');
 
   const { data, refreshData } = useData();
+  const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = (e) => {
@@ -69,7 +71,15 @@ export const Signup = () => {
     logActivity('user_created', newUser, `New officer registered: ${username}`, { stationId: station.id });
 
     refreshData();
-    navigate('/login', { state: { message: 'Registration successful! Please log in.' } });
+    
+    // Automatically log in the user after registration
+    const loginResult = login(username, stationPassword);
+    if (loginResult.success) {
+      navigate('/officer/dashboard');
+    } else {
+      // Fallback if login fails
+      navigate('/login', { state: { message: 'Registration successful! Please log in.' } });
+    }
   };
 
   return (

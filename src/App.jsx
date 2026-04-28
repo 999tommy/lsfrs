@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import { DataProvider } from './contexts/DataContext';
 import { ProtectedRoute } from './components/layout/ProtectedRoute';
@@ -34,11 +34,11 @@ function App() {
   return (
     <DataProvider>
       <AuthProvider>
-        <BrowserRouter>
+        <HashRouter>
           <Routes>
-            <Route path="/" element={<Navigate to="/login" replace />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
+            <Route path="/" element={<Navigate to="/login" replace />} />
 
             {/* Officer Portal */}
             <Route
